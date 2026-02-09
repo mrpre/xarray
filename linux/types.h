@@ -324,7 +324,12 @@ find_first_zero_bit(const unsigned long *addr, unsigned long size)
  * is already defined (after xarray.h inclusion).
  */
 #define radix_tree_node_cachep  ((void *)0)
-#define kmem_cache_alloc_lru(cachep, lru, gfp) calloc(1, sizeof(struct xa_node))
+#define kmem_cache_alloc_lru(cachep, lru, gfp) ({			\
+	struct xa_node *___n = calloc(1, sizeof(struct xa_node));	\
+	if (___n)							\
+		INIT_LIST_HEAD(&___n->private_list);			\
+	___n;								\
+})
 
 /* radix_tree_node_rcu_free is defined as a static inline in radix-tree.h */
 
